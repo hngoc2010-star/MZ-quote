@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<title>Plywood Quote</title>
+
+<style>
+
+body{
+font-family:Arial;
+background:#f3f3f3;
+display:flex;
+justify-content:center;
+padding:10px;
+}
+
+.app{
+width:330px;
+background:white;
+padding:14px;
+border-radius:8px;
+box-shadow:0 3px 8px rgba(0,0,0,.12);
+}
+
+h3{
+text-align:center;
+margin-bottom:8px;
+font-size:18px;
+}
+
+.row{
+display:flex;
+justify-content:space-between;
+align-items:center;
+margin-bottom:5px;
+font-size:13px;
+}
+
+.row input{
+width:80px;
+padding:3px;
+font-size:13px;
+text-align:right;
+}
+
+.result{
+margin-top:10px;
+font-size:13px;
+font-weight:bold;
+}
+
+.result div{
+display:flex;
+justify-content:space-between;
+margin:3px 0;
+}
+
+.blue{color:#2563eb;}
+.red{color:#dc2626;}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="app">
+
+<h3>Plywood Quote</h3>
+
+<div class="row">Thickness(mm)<input id="thickness"></div>
+<div class="row">Bundles<input id="bundle"></div>
+<div class="row">Pcs/Bundle<input id="pcsBundle"></div>
+
+<div class="row">USD Rate<input id="usd"></div>
+
+<div class="row">EXW (VND/pcs)<input id="exwpcs"></div>
+<div class="row">EXW (VND/cbm)<input id="exwcbm"></div>
+
+<div class="row">Logistics<input id="logistics"></div>
+<div class="row">CFR price (USD)<input id="cfr"></div>
+
+<div class="result">
+
+<div>Total PCS <span id="pcs">0</span></div>
+
+<div>CBM BUY <span id="buy">0</span></div>
+<div>CBM SELL <span id="sell">0</span></div>
+<div>CBM DIFF <span id="diff">0</span></div>
+
+<div>Profit / Container <span id="profit">0</span></div>
+
+</div>
+
+</div>
+
+<script>
+
+const W=1.22
+const L=2.44
+
+document.querySelectorAll("input").forEach(i=>{
+i.addEventListener("input",calc)
+})
+
+function n(id){
+return parseFloat(document.getElementById(id).value.replace(/,/g,''))||0
+}
+
+function f(x){
+return Number(x).toLocaleString("en-US",{maximumFractionDigits:2})
+}
+
+function calc(){
+
+let t=n("thickness")
+let bundle=n("bundle")
+let pcsb=n("pcsBundle")
+
+let usd=n("usd")
+
+let exwpcs=n("exwpcs")
+let exwcbm=n("exwcbm")
+
+let logistics=n("logistics")
+let cfr=n("cfr")
+
+let pcs=bundle*pcsb
+
+let cbmBuyPc=(t/1000)*W*L
+let cbmSellPc=((t-0.5)/1000)*W*L
+
+let cbmBuy=pcs*cbmBuyPc
+let cbmSell=pcs*cbmSellPc
+
+let cbmDiff=cbmSell-cbmBuy
+
+let exwTotal=0
+
+if(exwpcs>0){
+exwTotal=pcs*exwpcs
+}else if(exwcbm>0){
+exwTotal=cbmBuy*exwcbm
+}
+
+let totalCfr=exwTotal+logistics
+
+let selling=cbmSell*cfr*usd
+
+let profit=Math.round(selling-totalCfr)
+
+document.getElementById("pcs").innerText=f(pcs)
+
+document.getElementById("buy").innerText=f(cbmBuy)
+document.getElementById("sell").innerText=f(cbmSell)
+document.getElementById("diff").innerText=f(cbmDiff)
+
+let p=document.getElementById("profit")
+
+p.innerText=f(profit)
+
+p.className=profit>=0?"blue":"red"
+
+}
+
+</script>
+
+</body>
+</html>
